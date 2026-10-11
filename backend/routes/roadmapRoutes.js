@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 
 const { protect } = require("../middlewares/authMiddleware");
-const { generalLimiter } = require("../middlewares/rateLimiter");
 
 const {
   validateCreateRoadmap,
@@ -19,10 +18,11 @@ const {
   deleteRoadmap,
 } = require("../controllers/roadmapController");
 
-// Apply rate limiting first
-router.use(generalLimiter);
+// Rate limiting is applied at the server layer (server.js attaches
+// generalLimiter to /api/roadmaps) — a router-level limiter here would
+// double-charge every request against the same quota.
 
-// Then authentication
+// Authentication
 router.use(protect);
 
 router.post("/", validateCreateRoadmap, createRoadmap);
